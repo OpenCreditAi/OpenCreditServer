@@ -1,17 +1,25 @@
-from app import db
+from datetime import UTC, datetime  # Note: UTC is new in Python 3.11+
+from typing import List
+
 import bcrypt
-from datetime import datetime, UTC  # Note: UTC is new in Python 3.11+
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app import db
+
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(20), nullable=False)  # 'borrower' or 'financier'
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))  # Updated to use UTC
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True)
+    password_hash: Mapped[bytes] = mapped_column()
+    role: Mapped[str] = mapped_column(String(30))  # 'borrower' or 'financier'
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))  # Updated to use UTC
+
+    loans: Mapped[List["Loan"]] = relationship("Loan", back_populates="user")
 
     def set_password(self, password):
         salt = bcrypt.gensalt()
-        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), salt)
+        self.password_hash = bcrypt.hashpw(password.encode("utf-8"), salt)
 
     def check_password(self, password):
-        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
+        return bcrypt.checkpw(password.encode("utf-8"), self.password_hash)
