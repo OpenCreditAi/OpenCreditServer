@@ -12,6 +12,7 @@ class Loan(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     project_name: Mapped[str]
     adress: Mapped[str]
+    amount: Mapped[int]  # Amount of money needed
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))  # Updated to use UTC
 
     user: Mapped["User"] = relationship("User", back_populates="loans")

@@ -3,21 +3,25 @@ import os
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 from .config import Config
 
 db = SQLAlchemy()
 jwt = JWTManager()
+migrat = Migrate()
 
 
 def create_app():
     app = Flask(__name__)
+
     app.config.from_object(Config)
 
     CORS(app)
     db.init_app(app)
     jwt.init_app(app)
+    migrat.init_app(app, db)
 
     os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
     with app.app_context():

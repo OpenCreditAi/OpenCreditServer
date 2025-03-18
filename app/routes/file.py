@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt, jwt_required
 from werkzeug.utils import secure_filename
 
 from app.services.file_service import FileService

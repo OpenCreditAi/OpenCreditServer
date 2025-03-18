@@ -17,8 +17,9 @@ def signup():
 
     try:
         user = auth_service.create_user(email=data["email"], password=data["password"], role=data["role"])
-        access_token = create_access_token(identity=user.id)
-        return jsonify({"access_token": access_token, "user": {"id": user.id, "email": user.email, "role": user.role}}), 201
+        aadditional_claims = {"id": user.id, "email": user.email, "role": user.role}
+        access_token = create_access_token(identity=str(user.id), additional_claims=aadditional_claims)
+        return jsonify({"access_token": access_token}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
@@ -32,7 +33,8 @@ def signin():
 
     try:
         user: User = auth_service.authenticate_user(email=data["email"], password=data["password"])
-        access_token = create_access_token(identity=user.id)
-        return jsonify({"access_token": access_token, "user": {"id": user.id, "email": user.email, "role": user.role}})
+        aadditional_claims = {"id": user.id, "email": user.email, "role": user.role}
+        access_token = create_access_token(identity=str(user.id), additional_claims=aadditional_claims)
+        return jsonify({"access_token": access_token})
     except ValueError as e:
         return jsonify({"error": str(e)}), 401
