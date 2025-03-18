@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_file
 from flask_jwt_extended import get_jwt, jwt_required
 from werkzeug.utils import secure_filename
 
@@ -9,6 +9,7 @@ file_service = FileService()
 
 
 @file_bp.route("/file/upload_files", methods=["POST"])
+@jwt_required()
 def upload_files():
     data = request.form
     files = request.files
@@ -27,3 +28,18 @@ def upload_files():
         return jsonify({"status": "OK"}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+
+
+@file_bp.route("/file/download_file", methods=["GET"])
+@jwt_required()
+def download_file():
+    data = request.json
+
+    if not all(k in data for k in ["loan_id", "file_name"]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    file = file_service.get_file_url(data["loan_id"], secure_filename(data["file_name"]))
+    res = send_file(file)
+
+    print(res)
+    return jsonify({"status": "OK"}), 201

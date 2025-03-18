@@ -11,11 +11,10 @@ class FileService:
     def upload_file(self, loan_id: int, file_name: str, file: FileStorage):
         loan: Loan = Loan.query.filter_by(id=loan_id).first()
         if not loan:
-            raise ValueError("No such loan id")
+            raise ValueError(f"No such loan with id ${loan_id}")
 
-        loan_dir_path = os.path.join(Config.UPLOAD_FOLDER, loan_id)
+        loan_dir_path = os.path.join(Config.UPLOAD_FOLDER, str(loan_id))
         os.makedirs(loan_dir_path, exist_ok=True)
-
         file_path = os.path.join(loan_dir_path, file_name)
         file.save(file_path)
 
@@ -25,3 +24,11 @@ class FileService:
         db.session.commit()
 
         return file
+
+    def get_file_url(self, loan_id: int, file_name: str):
+        file: File = File.query.filter_by(loan_id=loan_id, file_name=file_name).first()
+
+        if not file:
+            raise ValueError(f"No such file as {file_name} for loan {loan_id}")
+
+        return file.url
