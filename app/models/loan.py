@@ -11,7 +11,7 @@ class Loan(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     project_name: Mapped[str]
-    adress: Mapped[str]
+    address: Mapped[str]
     amount: Mapped[int]  # Amount of money needed
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))  # Updated to use UTC
 
