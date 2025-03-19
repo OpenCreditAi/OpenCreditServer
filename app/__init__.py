@@ -28,13 +28,16 @@ def create_app():
         from .routes.auth import auth_bp
         from .routes.file import file_bp
         from .routes.loan import loan_bp
+        from .routes.offer import offer_bp
 
         app.register_blueprint(auth_bp)
         app.register_blueprint(loan_bp)
         app.register_blueprint(file_bp)
+        app.register_blueprint(offer_bp)
+
 
         # Import models to ensure they're registered with SQLAlchemy
-        from .models import File, Loan, User
+        from .models import File, Loan, User, offer
 
         # Create tables if they don't exist
         db.create_all()
