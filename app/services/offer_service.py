@@ -5,7 +5,8 @@ from app.models import Offer, User
 class OfferService:
     def create_offer(self, offerAmount, interestRate, offerTerms, requestId):
         user = User.query.filter_by(email=email).first()
-        offer = Loan(user=user, offerAmount=offerAmount, interestRate=interestRate, offerTerms=offerTerms, requestId=requestId)
+        offer = Loan(user=user, offerAmount=offerAmount, interestRate=interestRate, offerTerms=offerTerms,
+                     requestId=requestId, status="Pending")
 
         db.session.add(offer)
         db.session.commit()
