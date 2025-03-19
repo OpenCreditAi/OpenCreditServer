@@ -14,7 +14,7 @@ def new_request():
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
-        user = auth_service.create_offer(offerAmount=data["offerAmount"], interestRate=data["interestRate"],
+        user = offer_service.create_offer(offerAmount=data["offerAmount"], interestRate=data["interestRate"],
  offerTerms=data["offerTerms"], requestId=data["requestId"] )
         return 201
     except ValueError as e:
