@@ -17,3 +17,4 @@ class Loan(db.Model):
 
     user: Mapped["User"] = relationship("User", back_populates="loans")
     files: Mapped[List["File"]] = relationship("File", back_populates="loan")
+    offers: Mapped[List["Offer"]] = relationship("Offer", back_populates="loan")
