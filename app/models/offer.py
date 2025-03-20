@@ -11,8 +11,8 @@ class Offer(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     offer_amount: Mapped[int]
     interest_rate: Mapped[int]
-    offerTerms: Mapped[str] 
-    requestId: Mapped[int]
+    offer_terms: Mapped[str] 
+    request_id: Mapped[int]
     status: Mapped[str]
-
-    user: Mapped["User"] = relationship("User", back_populates="Offer")
+    repayment_period: Mapped[int]
+    user: Mapped["User"] = relationship("User", back_populates="offers")

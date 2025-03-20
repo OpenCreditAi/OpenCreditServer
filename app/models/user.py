@@ -16,6 +16,7 @@ class User(db.Model):
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))  # Updated to use UTC
 
     loans: Mapped[List["Loan"]] = relationship("Loan", back_populates="user")
+    offers: Mapped[List["Offer"]] = relationship("Offer", back_populates="user")
 
     def set_password(self, password):
         salt = bcrypt.gensalt()
