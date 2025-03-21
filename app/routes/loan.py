@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt, jwt_required
 
+from app.models import Loan
 from app.services.loan_service import LoanService
 
 loan_bp = Blueprint("loan", __name__)
@@ -20,7 +21,7 @@ def create_loan():
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
-        loan_service.create_loan(email=current_user["email"], project_name=data["project_name"], address=data["address"], amount=data["amount"])
-        return jsonify({"status": "OK"}), 201
+        loan: Loan = loan_service.create_loan(email=current_user["email"], project_name=data["project_name"], address=data["address"], amount=data["amount"])
+        return jsonify({"id": loan.id}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400

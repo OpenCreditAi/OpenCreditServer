@@ -12,8 +12,7 @@ file_service = FileService()
 @jwt_required()
 def upload_files():
     data = request.form
-    files = request.files
-    file_names = files.keys()
+    files = request.files.getlist("files")
 
     if len(files) <= 0:
         return jsonify({"error": "Missing Files"}), 400
@@ -22,8 +21,8 @@ def upload_files():
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
-        for file in file_names:
-            file_service.upload_file(data["loan_id"], secure_filename(files[file].filename), files[file])
+        for file in files:
+            file_service.upload_file(data["loan_id"], secure_filename(file.filename), file)
 
         return jsonify({"status": "OK"}), 201
     except ValueError as e:
