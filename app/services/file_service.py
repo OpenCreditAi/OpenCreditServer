@@ -26,7 +26,7 @@ class FileService:
         return file
 
     def get_file_url(self, loan_id: int, file_name: str):
-        file: File = File.query.filter_by(loan_id=loan_id, file_name=file_name).first()
+        file: File = File.query.filter_by(loan_id=loan_id, file_basename=os.path.splitext(file_name)[0]).first()
 
         if not file:
             raise ValueError(f"No such file as {file_name} for loan {loan_id}")
