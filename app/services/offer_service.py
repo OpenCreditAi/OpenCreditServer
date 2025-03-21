@@ -41,6 +41,8 @@ class OfferService:
                 "interest_rate": offer.interest_rate,
                 "repayment_period": offer.repayment_period,
                 "status": offer.status,
+                "id": offer.id,
+                "user_name": offer.user.email, #until there is organization that the user is related to
             }
             offer_list.append(offer_data)
 
