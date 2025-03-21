@@ -13,7 +13,9 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(255), unique=True)
     password_hash: Mapped[bytes] = mapped_column()
     role: Mapped[str] = mapped_column(String(30))  # 'borrower' or 'financier'
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))  # Updated to use UTC
+    created_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(UTC)
+    )  # Updated to use UTC
 
     loans: Mapped[List["Loan"]] = relationship("Loan", back_populates="user")
     offers: Mapped[List["Offer"]] = relationship("Offer", back_populates="user")
@@ -24,3 +26,9 @@ class User(db.Model):
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode("utf-8"), self.password_hash)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+        }
