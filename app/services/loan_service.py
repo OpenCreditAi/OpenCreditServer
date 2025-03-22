@@ -24,7 +24,7 @@ class LoanService:
         if user.role == "financier":
             return Loan.query.all()
         else:
-            return user.loans
+            return Loan.query.filter_by(user_id=user.id).all()
 
     def get_loan(self, id):
         return Loan.query.get(id)
