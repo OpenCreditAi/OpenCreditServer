@@ -13,6 +13,8 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(255), unique=True)
     password_hash: Mapped[bytes] = mapped_column()
     role: Mapped[str] = mapped_column(String(30))  # 'borrower' or 'financier'
+    full_name: Mapped[str]
+    phone_number: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(UTC)
     )  # Updated to use UTC
@@ -31,4 +33,6 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
+            "full_name": self.full_name,
+            "phone_number": self.phone_number,
         }

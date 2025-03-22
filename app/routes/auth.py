@@ -12,13 +12,21 @@ auth_service = AuthService()
 def signup():
     data = request.get_json()
 
-    if not all(k in data for k in ["email", "password", "role"]):
+    if not all(k in data for k in ["email", "password", "role", "fullName", "phoneNumber"]):
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
-        user = auth_service.create_user(email=data["email"], password=data["password"], role=data["role"])
+        user = auth_service.create_user(
+            email=data["email"],
+            password=data["password"],
+            role=data["role"],
+            full_name=data["fullName"],
+            phone_number=data["phoneNumber"],
+        )
         aadditional_claims = {"id": user.id, "email": user.email, "role": user.role}
-        access_token = create_access_token(identity=str(user.id), additional_claims=aadditional_claims)
+        access_token = create_access_token(
+            identity=str(user.id), additional_claims=aadditional_claims
+        )
         return jsonify({"access_token": access_token}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -32,9 +40,13 @@ def signin():
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
-        user: User = auth_service.authenticate_user(email=data["email"], password=data["password"])
+        user: User = auth_service.authenticate_user(
+            email=data["email"], password=data["password"]
+        )
         aadditional_claims = {"id": user.id, "email": user.email, "role": user.role}
-        access_token = create_access_token(identity=str(user.id), additional_claims=aadditional_claims)
+        access_token = create_access_token(
+            identity=str(user.id), additional_claims=aadditional_claims
+        )
         return jsonify({"access_token": access_token})
     except ValueError as e:
         return jsonify({"error": str(e)}), 401

@@ -3,11 +3,11 @@ from app.models import User
 
 
 class AuthService:
-    def create_user(self, email, password, role):
+    def create_user(self, email, password, role, full_name, phone_number):
         if User.query.filter_by(email=email).first():
             raise ValueError("Email already registered")
 
-        user = User(email=email, role=role)
+        user = User(email=email, role=role, full_name=full_name, phone_number=phone_number)
         user.set_password(password)
 
         db.session.add(user)
