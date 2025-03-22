@@ -32,13 +32,15 @@ def upload_files():
 @file_bp.route("/file/download_file", methods=["GET"])
 @jwt_required()
 def download_file():
-    data = request.json
+    loan_id = request.args.get("loan_id")
+    file_basename = request.args.get("file_basename")
 
-    if not all(k in data for k in ["loan_id", "file_name"]):
+    if not loan_id or not file_basename:
         return jsonify({"error": "Missing required fields"}), 400
 
-    file = file_service.get_file_url(data["loan_id"], secure_filename(data["file_name"]))
-    res = send_file(file)
+    try:
+        file = file_service.get_file_url(loan_id, secure_filename(file_basename))
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    return send_file(file)
 
-    print(res)
-    return jsonify({"status": "OK"}), 201
