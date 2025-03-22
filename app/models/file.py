@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, UTC
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint
 
@@ -7,10 +8,10 @@ from app import db
 
 
 class File(db.Model):
-    __tablename__ = "file"
+    __tablename__ = "files"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    loan_id: Mapped[int] = mapped_column(ForeignKey("loan.id", name="fk_file_loan"), nullable=False)
+    loan_id: Mapped[int] = mapped_column(ForeignKey("loans.id", name="fk_file_loan"), nullable=False)
     file_name: Mapped[str] = mapped_column(nullable=False)  # Full filename, e.g., "document.pdf"
     file_basename: Mapped[str] = mapped_column(nullable=False)  # Filename without extension, e.g., "document"
     url: Mapped[str] = mapped_column(nullable=False)
