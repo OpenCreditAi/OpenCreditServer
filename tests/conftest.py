@@ -27,7 +27,13 @@ def runner(app):
 @pytest.fixture
 def test_user(app):
     with app.app_context():
-        user = User(email='test@example.com', role='borrower')
+        user = User(
+            email='test@example.com',
+            role='borrower',
+            full_name='Test User',
+            phone_number='1234567890',
+            organization='Test Organization'
+        )
         user.set_password('password123')
         db.session.add(user)
         db.session.commit()

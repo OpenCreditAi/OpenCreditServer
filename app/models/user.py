@@ -15,6 +15,7 @@ class User(db.Model):
     role: Mapped[str] = mapped_column(String(30))  # 'borrower' or 'financier'
     full_name: Mapped[str]
     phone_number: Mapped[str]
+    organization = db.Column(db.String(120), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(UTC)
     )  # Updated to use UTC
@@ -35,4 +36,6 @@ class User(db.Model):
             "email": self.email,
             "full_name": self.full_name,
             "phone_number": self.phone_number,
+            "role": self.role,
+            "organization": self.organization,
         }
