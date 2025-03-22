@@ -10,7 +10,10 @@ def test_create_user(app):
         user = auth_service.create_user(
             email='new@example.com',
             password='secret123',
-            role='financier'
+            role='financier',
+            full_name='New User',
+            phone_number='1234567890',
+            organization='New Organization'
         )
         
         assert user.id is not None
@@ -29,27 +32,37 @@ def test_create_duplicate_user(app, test_user):
         # Should raise error for duplicate email
         with pytest.raises(ValueError) as excinfo:
             auth_service.create_user(
-                email='test@example.com',  # Same as test_user
+                email='test@example.com',  # Use the same email as test_user
                 password='new_password',
-                role='borrower'
+                role='borrower',
+                full_name='Test User',
+                phone_number='1234567890',
+                organization='Test Organization'
             )
             
         assert 'Email already registered' in str(excinfo.value)
 
 def test_authenticate_user(app):
     with app.app_context():
-        # Create a user specifically for this test
         auth_service = AuthService()
         auth_service.create_user(
             email='auth_test@example.com',
             password='password123',
-            role='borrower'
+            role='borrower',
+            full_name='Auth Test',
+            phone_number='1234567890',
+            organization='Test Organization'
         )
         
         # Valid credentials
         user = auth_service.authenticate_user('auth_test@example.com', 'password123')
         assert user is not None
         assert user.email == 'auth_test@example.com'
+        assert user.role == 'borrower'
+        assert user.full_name == 'Auth Test'
+        assert user.phone_number == '1234567890'
+        assert user.organization == 'Test Organization'
+        assert user.check_password('password123') is True  # Fixed: checking correct password
         
         # Invalid email
         with pytest.raises(ValueError):

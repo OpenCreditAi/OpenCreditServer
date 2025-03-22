@@ -22,12 +22,23 @@ def signup():
             role=data["role"],
             full_name=data["fullName"],
             phone_number=data["phoneNumber"],
+            organization=data["organization"],
         )
         aadditional_claims = {"id": user.id, "email": user.email, "role": user.role}
         access_token = create_access_token(
             identity=str(user.id), additional_claims=aadditional_claims
         )
-        return jsonify({"access_token": access_token}), 201
+        return jsonify({
+            "access_token": access_token,
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'role': user.role,
+                'fullName': user.full_name,
+                'phoneNumber': user.phone_number,
+                'organization': user.organization
+            }
+        }), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
@@ -41,12 +52,23 @@ def signin():
 
     try:
         user: User = auth_service.authenticate_user(
-            email=data["email"], password=data["password"]
+            email=data["email"],
+            password=data["password"]
         )
-        aadditional_claims = {"id": user.id, "email": user.email, "role": user.role}
+        additional_claims = {"id": user.id, "email": user.email, "role": user.role}
         access_token = create_access_token(
-            identity=str(user.id), additional_claims=aadditional_claims
+            identity=str(user.id), additional_claims=additional_claims
         )
-        return jsonify({"access_token": access_token})
+        return jsonify({
+            "access_token": access_token,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "role": user.role,
+                "fullName": user.full_name,
+                "phoneNumber": user.phone_number,
+                "organization": user.organization
+            }
+        })
     except ValueError as e:
         return jsonify({"error": str(e)}), 401
