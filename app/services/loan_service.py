@@ -21,7 +21,11 @@ class LoanService:
 
     def get_loans(self, email):
         user = User.query.filter_by(email=email).first()
-        return Loan.query.filter_by(organization_id=user.organization_id)
+
+        if user.role == "financier":
+            return set([offer.loan for offer in user.organization.offers])
+        else:
+            return Loan.query.filter_by(organization_id=user.organization_id)
 
     def get_marketplace_loans(self):
         return Loan.query.all()
