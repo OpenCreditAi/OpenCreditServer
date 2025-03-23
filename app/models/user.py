@@ -38,4 +38,7 @@ class User(db.Model):
             "email": self.email,
             "full_name": self.full_name,
             "phone_number": self.phone_number,
+            "role": self.role,
+            "organization": self.organization,
+
         }
