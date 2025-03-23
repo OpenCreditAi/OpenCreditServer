@@ -30,6 +30,6 @@ class Loan(db.Model):
             "project_name": self.project_name,
             "address": self.address,
             "amount": self.amount,
-            "created_at": self.created_at,\
+            "created_at": self.created_at,
             "file_names": [file.name for file in self.files]
         }
