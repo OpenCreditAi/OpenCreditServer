@@ -52,7 +52,8 @@ def signin():
 
     try:
         user: User = auth_service.authenticate_user(
-            email=data["email"], password=data["password"]
+            email=data["email"],
+            password=data["password"]
         )
         additional_claims = {"id": user.id, "email": user.email, "role": user.role}
         access_token = create_access_token(

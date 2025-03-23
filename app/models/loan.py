@@ -40,4 +40,5 @@ class Loan(db.Model):
             "amount": self.amount,
             "created_at": self.created_at,
             "organization_name": self.organization.name,
+            "file_names": [file.name for file in self.files]
         }
