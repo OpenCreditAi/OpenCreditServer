@@ -7,7 +7,9 @@ from app.models import Loan, Offer, User
 
 
 class OfferService:
-    def create_offer(self, offer_amount, interest_rate, offer_terms, repayment_period, loan_id, email):
+    def create_offer(
+        self, offer_amount, interest_rate, offer_terms, repayment_period, loan_id, email
+    ):
 
         user: User = User.query.filter_by(email=email).first()
         loan: Loan = Loan.query.filter_by(id=loan_id).first()
@@ -18,6 +20,7 @@ class OfferService:
         offer = Offer(
             user=user,
             loan=loan,
+            organization=user.organization,
             offer_amount=offer_amount,
             interest_rate=interest_rate,
             offer_terms=offer_terms,
@@ -42,7 +45,7 @@ class OfferService:
                 "repayment_period": offer.repayment_period,
                 "status": offer.status,
                 "id": offer.id,
-                "user_name": offer.user.email, #until there is organization that the user is related to
+                "organization_name": offer.organization.name,
             }
             offer_list.append(offer_data)
 
@@ -53,7 +56,16 @@ class OfferService:
             offer: Offer = Offer.query.get(id)
             offer.status = "Accepted"
             db.session.commit()
-            return jsonify({"message": "Offer status updated successfully", "offer_id": offer.id, "new_status": offer.status}), 200
+            return (
+                jsonify(
+                    {
+                        "message": "Offer status updated successfully",
+                        "offer_id": offer.id,
+                        "new_status": offer.status,
+                    }
+                ),
+                200,
+            )
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
@@ -63,7 +75,16 @@ class OfferService:
             offer: Offer = Offer.query.get(id)
             offer.status = "Denied"
             db.session.commit()
-            return jsonify({"message": "Offer status updated successfully", "offer_id": offer.id, "new_status": offer.status}), 200
+            return (
+                jsonify(
+                    {
+                        "message": "Offer status updated successfully",
+                        "offer_id": offer.id,
+                        "new_status": offer.status,
+                    }
+                ),
+                200,
+            )
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500

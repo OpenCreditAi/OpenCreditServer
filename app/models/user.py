@@ -1,27 +1,29 @@
 from datetime import UTC, datetime  # Note: UTC is new in Python 3.11+
-from typing import List
 
 import bcrypt
-from sqlalchemy import String
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app import db
 
 
 class User(db.Model):
+    __tablename__ = "users"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True)
     password_hash: Mapped[bytes] = mapped_column()
     role: Mapped[str] = mapped_column(String(30))  # 'borrower' or 'financier'
     full_name: Mapped[str]
     phone_number: Mapped[str]
-    organization = db.Column(db.String(120), nullable=False)
+    organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"))
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(UTC)
     )  # Updated to use UTC
 
-    loans: Mapped[List["Loan"]] = relationship("Loan", back_populates="user")
-    offers: Mapped[List["Offer"]] = relationship("Offer", back_populates="user")
+    organization: Mapped["Organization"] = relationship(
+        "Organization", back_populates="users"
+    )
 
     def set_password(self, password):
         salt = bcrypt.gensalt()
@@ -36,6 +38,4 @@ class User(db.Model):
             "email": self.email,
             "full_name": self.full_name,
             "phone_number": self.phone_number,
-            "role": self.role,
-            "organization": self.organization,
         }

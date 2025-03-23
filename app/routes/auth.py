@@ -12,7 +12,17 @@ auth_service = AuthService()
 def signup():
     data = request.get_json()
 
-    if not all(k in data for k in ["email", "password", "role", "fullName", "phoneNumber"]):
+    if not all(
+        k in data
+        for k in [
+            "email",
+            "password",
+            "role",
+            "fullName",
+            "phoneNumber",
+            "organizationName",
+        ]
+    ):
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
@@ -22,23 +32,13 @@ def signup():
             role=data["role"],
             full_name=data["fullName"],
             phone_number=data["phoneNumber"],
-            organization=data["organization"],
+            organization_name=data["organizationName"],
         )
         aadditional_claims = {"id": user.id, "email": user.email, "role": user.role}
         access_token = create_access_token(
             identity=str(user.id), additional_claims=aadditional_claims
         )
-        return jsonify({
-            "access_token": access_token,
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'role': user.role,
-                'fullName': user.full_name,
-                'phoneNumber': user.phone_number,
-                'organization': user.organization
-            }
-        }), 201
+        return jsonify({"access_token": access_token, "user": user.to_dict()}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
@@ -59,16 +59,6 @@ def signin():
         access_token = create_access_token(
             identity=str(user.id), additional_claims=additional_claims
         )
-        return jsonify({
-            "access_token": access_token,
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "role": user.role,
-                "fullName": user.full_name,
-                "phoneNumber": user.phone_number,
-                "organization": user.organization
-            }
-        })
+        return jsonify({"access_token": access_token, "user": user.to_dict()})
     except ValueError as e:
         return jsonify({"error": str(e)}), 401

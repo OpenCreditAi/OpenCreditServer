@@ -7,7 +7,7 @@ loan_bp = Blueprint("loan", __name__)
 loan_service = LoanService()
 
 
-@loan_bp.route("/loan/create_loan", methods=["POST"])
+@loan_bp.route("/loans", methods=["POST"])
 @jwt_required()
 def create_loan():
     data = request.get_json()
@@ -47,20 +47,35 @@ def get_loans():
 
         return (
             jsonify({"loans": [loan.to_dict() for loan in loans]}),
-            201,
+            200,
         )
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
 
-@loan_bp.route("/loan/<int:id>", methods=["GET"])
+@loan_bp.route("/loans/marketplace", methods=["GET"])
+@jwt_required()
+def get_marketplace_loans():
+
+    try:
+        loans = loan_service.get_marketplace_loans()
+
+        return (
+            jsonify({"loans": [loan.to_dict() for loan in loans]}),
+            200,
+        )
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@loan_bp.route("/loans/<int:id>", methods=["GET"])
 @jwt_required()
 def get_loan(id):
     try:
         loan = loan_service.get_loan(id=id)
         return (
             jsonify({"loan": {**loan.to_dict(), "borrower": loan.user.to_dict()}}),
-            201,
+            200,
         )
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
