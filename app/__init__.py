@@ -38,8 +38,18 @@ def create_app():
 
         # Import models to ensure they're registered with SQLAlchemy
         from .models import File, Loan, User, offer
-
+        
+        # If you have other data with id's that are used in the static data then it will raise an error,
+        # so the easy solution is to drop all active data
+        if Config.ADD_STATIC_OFFERS:
+            db.drop_all()
+            
+            
         # Create tables if they don't exist
         db.create_all()
+        
+        if Config.ADD_STATIC_OFFERS:
+            from .populate_db import populate
+            populate()
 
     return app
