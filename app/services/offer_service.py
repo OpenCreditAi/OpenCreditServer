@@ -50,6 +50,26 @@ class OfferService:
             offer_list.append(offer_data)
 
         return jsonify(offer_list)
+    
+    def get_offers(self, loan_id, email):
+        
+        organzation = db.session.query(User).filter_by(email=email).first().organization
+
+        offers: List[Offer] = Offer.query.filter_by(loan_id=loan_id, organization_id=organzation.id).all()
+        offer_list = []
+
+        for offer in offers:
+            offer_data = {
+                "offer_amount": offer.offer_amount,
+                "interest_rate": offer.interest_rate,
+                "repayment_period": offer.repayment_period,
+                "status": offer.status,
+                "id": offer.id,
+                "organization_name": offer.organization.name,
+            }
+            offer_list.append(offer_data)
+
+        return jsonify(offer_list)
 
     def accept(self, id):
         try:

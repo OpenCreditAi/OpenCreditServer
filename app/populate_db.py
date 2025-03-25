@@ -48,6 +48,15 @@ users_data = [
         "phone_number": "987-654-3210",
         "organization_id": 14,
     },
+    {
+        "id": 15,
+        "email": "financier3@gmail.com",
+        "password": "Aa123456",
+        "role": "financier",
+        "full_name": "financier3",
+        "phone_number": "555-123-4567",
+        "organization_id": 13,
+    },
 ]
 
 # Sample Loan Data
