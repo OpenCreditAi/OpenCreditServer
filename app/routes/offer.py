@@ -41,6 +41,17 @@ def get_offer(id):
         return offers
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+    
+@offer_bp.route("/offer/get/org/<int:id>", methods=["GET"])
+@jwt_required()
+def get_org_offer(id):
+    try: 
+        current_user = get_jwt()
+        offers = offer_service.get_offers(loan_id=id, email=current_user['email'])
+        
+        return offers
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 
 @offer_bp.route("/offer/accept/<int:id>", methods=["PATCH"])
