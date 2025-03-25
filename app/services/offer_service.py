@@ -37,7 +37,7 @@ class OfferService:
 
         offers: List[Offer] = Offer.query.filter_by(loan_id=loan_id).all()
         offer_list = []
-
+        
         for offer in offers:
             offer_data = {
                 "offer_amount": offer.offer_amount,
@@ -51,7 +51,7 @@ class OfferService:
 
         return jsonify(offer_list)
     
-    def get_offers(self, loan_id, email):
+    def get_offers_organization(self, loan_id, email):
         
         organzation = db.session.query(User).filter_by(email=email).first().organization
 

@@ -47,7 +47,7 @@ def get_offer(id):
 def get_org_offer(id):
     try: 
         current_user = get_jwt()
-        offers = offer_service.get_offers(loan_id=id, email=current_user['email'])
+        offers = offer_service.get_offers_organization(loan_id=id, email=current_user['email'])
         
         return offers
     except ValueError as e:
