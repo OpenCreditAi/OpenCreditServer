@@ -35,3 +35,11 @@ class AuthService:
             raise ValueError("Invalid email or password")
 
         return user
+
+    def get_user_details(self, email) -> User:
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            raise ValueError("Invalid email")
+
+        return user
