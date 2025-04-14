@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_APP=app/__init__.py
+      - FLASK_ENV=development
+      - DB_USER=opencredit
+      - DB_PASSWORD=opencredit
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=opencredit
+      - SECRET_KEY=your-secret-key-here
+      - JWT_SECRET_KEY=your-jwt-secret-key-here
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: sh /app/init.sh
+
+  db:
+    image: postgres:14
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=opencredit
+      - POSTGRES_PASSWORD=opencredit
+      - POSTGRES_DB=opencredit
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U opencredit -d opencredit"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
