@@ -8,7 +8,7 @@ from app.models import Loan, Offer, User
 
 class OfferService:
     def create_offer(
-        self, offer_amount, interest_rate, offer_terms, repayment_period, loan_id, email
+            self, offer_amount, interest_rate, offer_terms, repayment_period, loan_id, email
     ):
 
         user: User = User.query.filter_by(email=email).first()
@@ -25,7 +25,7 @@ class OfferService:
             interest_rate=interest_rate,
             offer_terms=offer_terms,
             repayment_period=repayment_period,
-            status="Pending",
+            status=Offer.Status.PENDING_BORROWER,
         )
 
         db.session.add(offer)
@@ -36,45 +36,21 @@ class OfferService:
     def get_offers(self, loan_id):
 
         offers: List[Offer] = Offer.query.filter_by(loan_id=loan_id).all()
-        offer_list = []
-        
-        for offer in offers:
-            offer_data = {
-                "offer_amount": offer.offer_amount,
-                "interest_rate": offer.interest_rate,
-                "repayment_period": offer.repayment_period,
-                "status": offer.status,
-                "id": offer.id,
-                "organization_name": offer.organization.name,
-            }
-            offer_list.append(offer_data)
 
-        return jsonify(offer_list)
-    
+        return OfferService.__jsonify_offers(offers)
+
     def get_offers_organization(self, loan_id, email):
-        
+
         organzation = db.session.query(User).filter_by(email=email).first().organization
 
         offers: List[Offer] = Offer.query.filter_by(loan_id=loan_id, organization_id=organzation.id).all()
-        offer_list = []
 
-        for offer in offers:
-            offer_data = {
-                "offer_amount": offer.offer_amount,
-                "interest_rate": offer.interest_rate,
-                "repayment_period": offer.repayment_period,
-                "status": offer.status,
-                "id": offer.id,
-                "organization_name": offer.organization.name,
-            }
-            offer_list.append(offer_data)
-
-        return jsonify(offer_list)
+        return OfferService.__jsonify_offers(offers)
 
     def accept(self, id):
         try:
             offer: Offer = Offer.query.get(id)
-            offer.status = "Accepted"
+            offer.status = Offer.Status.ACCEPTED
             db.session.commit()
             return (
                 jsonify(
@@ -93,7 +69,7 @@ class OfferService:
     def reject(self, id):
         try:
             offer: Offer = Offer.query.get(id)
-            offer.status = "Denied"
+            offer.status = Offer.Status.REJECTED
             db.session.commit()
             return (
                 jsonify(
@@ -108,3 +84,13 @@ class OfferService:
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 500
+
+    @staticmethod
+    def __jsonify_offers(offers: list):
+        offer_list = []
+        for offer in offers:
+            offer_data = offer.to_dict()
+
+            offer_list.append(offer_data)
+
+        return jsonify(offer_list)

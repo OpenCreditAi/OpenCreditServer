@@ -12,6 +12,7 @@ class LoanService:
             project_name=project_name,
             address=address,
             amount=amount,
+            status=Loan.Status.PROCESSING_DOCUMENTS,
         )
 
         db.session.add(loan)

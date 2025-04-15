@@ -1,13 +1,24 @@
 from datetime import UTC, datetime  # Note: UTC is new in Python 3.11+
+from enum import IntEnum
 from typing import List
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Enum as SqlEnum
 
 from app import db
 
 
 class Loan(db.Model):
+    class Status(IntEnum):
+        PROCESSING_DOCUMENTS = 1
+        MISSING_DOCUMENTS = 2
+        PENDING_OFFERS = 3
+        WAITING_FOR_OFFERS = 4
+        ACTIVE_LOAN = 5
+        PAID = 6
+        EXPIRED = 7
+
     __tablename__ = "loans"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -16,6 +27,7 @@ class Loan(db.Model):
     project_type: Mapped[str]
     project_name: Mapped[str]
     address: Mapped[str]
+    status = db.Column(SqlEnum(Status, name="status_enum", native_enum=False), nullable=False)
     amount: Mapped[int]  # Amount of money needed
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(UTC)
@@ -38,6 +50,7 @@ class Loan(db.Model):
             "project_name": self.project_name,
             "address": self.address,
             "amount": self.amount,
+            "status": self.status,
             "created_at": self.created_at,
             "organization_name": self.organization.name,
             "file_names": [file.file_basename for file in self.files]

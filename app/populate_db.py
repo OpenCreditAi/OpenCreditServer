@@ -7,7 +7,7 @@ organizations_data = [
     {"id": 11, "name": "בנק לאומי"},
     {"id": 12, "name": "נדלן"},
     {"id": 13, "name": "בנק הפועלים"},
-    {"id": 14, "name": "השקאות"},
+    {"id": 14, "name": "השקעות"},
 ]
 
 # Sample User Data
@@ -399,6 +399,7 @@ def populate_loans():
             project_name=loan_data["project_name"],
             address=loan_data["address"],
             amount=loan_data["amount"],
+            status=Loan.Status.PROCESSING_DOCUMENTS,
         )
         loans.append(loan)
 
