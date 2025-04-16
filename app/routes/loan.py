@@ -28,6 +28,7 @@ def create_loan():
             project_name=data["project_name"],
             address=data["address"],
             amount=data["amount"],
+
         )
         return jsonify({"id": loan.id}), 201
     except ValueError as e:
