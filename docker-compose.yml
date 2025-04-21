@@ -23,13 +23,14 @@ services:
     command: sh /app/init.sh
 
   db:
-    image: postgres:14
+    image: postgres:17
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=opencredit
       - POSTGRES_PASSWORD=opencredit
       - POSTGRES_DB=opencredit
+      - POSTGRES_INITDB_ARGS=--data-checksums
     ports:
       - "5432:5432"
     healthcheck:

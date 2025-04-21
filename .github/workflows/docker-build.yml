@@ -1,38 +1,38 @@
-name: Docker Build and Push
+# name: Docker Build and Push
 
-on:
-  push:
-    branches: [ "master" ]
-    tags:
-    - 'v*.*.*'
+# on:
+#   push:
+#     branches: [ "master" ]
+#     tags:
+#     - 'v*.*.*'
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+# jobs:
+#   build-and-push:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+#     - name: Set up Docker Buildx
+#       uses: docker/setup-buildx-action@v2
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+#     - name: Login to DockerHub
+#       uses: docker/login-action@v2
+#       with:
+#         username: ${{ secrets.DOCKERHUB_USERNAME }}
+#         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Extract version from tag
-      if: startsWith(github.ref, 'refs/tags/')
-      id: extract_version
-      run: |
-        echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+#     - name: Extract version from tag
+#       if: startsWith(github.ref, 'refs/tags/')
+#       id: extract_version
+#       run: |
+#         echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-    - name: Build and push
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        tags: |
-          yonatansinay2020/opencredit:${{ steps.extract_version.outputs.version }}
-          yonatansinay2020/opencredit:latest
+#     - name: Build and push
+#       uses: docker/build-push-action@v4
+#       with:
+#         context: .
+#         push: true
+#         tags: |
+#           yonatansinay2020/opencredit:${{ steps.extract_version.outputs.version }}
+#           yonatansinay2020/opencredit:latest
