@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opencredit-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: {{ .Values.ingress.host | default "opencredit.example.com" }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: opencredit-frontend
+            port:
+              number: {{ .Values.frontend.service.port }}
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: opencredit-backend
+            port:
+              number: {{ .Values.backend.service.port }} 

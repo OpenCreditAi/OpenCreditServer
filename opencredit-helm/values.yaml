@@ -1,0 +1,52 @@
+# Global values
+global:
+  environment: production
+
+# Backend service configuration
+backend:
+  image:
+    repository: opencredit-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  replicas: 1
+  env:
+    - name: FLASK_ENV
+      value: "production"
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: opencredit-secrets
+          key: database-url
+
+# Frontend service configuration
+frontend:
+  image:
+    repository: opencredit-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  replicas: 1
+  env:
+    - name: NODE_ENV
+      value: "production"
+    - name: NEXT_PUBLIC_API_URL
+      value: "http://opencredit-backend:5000" 
