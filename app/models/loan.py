@@ -11,13 +11,13 @@ from app import db
 
 class Loan(db.Model):
     class Status(IntEnum):
-        PROCESSING_DOCUMENTS = 1
-        MISSING_DOCUMENTS = 2
-        PENDING_OFFERS = 3
-        WAITING_FOR_OFFERS = 4
-        ACTIVE_LOAN = 5
-        PAID = 6
-        EXPIRED = 7
+        PROCESSING_DOCUMENTS = 0
+        MISSING_DOCUMENTS = 1
+        PENDING_OFFERS = 2
+        WAITING_FOR_OFFERS = 3
+        ACTIVE_LOAN = 4
+        PAID = 5
+        EXPIRED = 6
 
     __tablename__ = "loans"
 

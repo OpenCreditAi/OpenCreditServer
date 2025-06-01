@@ -1,17 +1,20 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt, jwt_required
 
+from app.models import Loan
+from app.services.loan_service import LoanService
 from app.services.offer_service import OfferService
 
 offer_bp = Blueprint("offer", __name__)
 offer_service = OfferService()
-
+loan_service = LoanService()
 
 @offer_bp.route("/offer/new", methods=["POST"])
 @jwt_required()
 def new_request():
     data = request.get_json()
     current_user = get_jwt()
+    loan = loan_service.get_loan(id=data["loan_id"])
 
     if "email" not in current_user.keys():
         return jsonify({"error": "Missing email in jwt"}), 400
@@ -28,6 +31,10 @@ def new_request():
             loan_id=data["loan_id"],
             email=current_user["email"],
         )
+
+        if loan.status != Loan.Status.PENDING_OFFERS:
+            loan_service.update_loan_status(data["loan_id"], Loan.Status.PENDING_OFFERS)
+
         return jsonify({"status": "OK"}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400

@@ -1,12 +1,14 @@
 from flask import Blueprint, jsonify, request, send_file
-from flask_jwt_extended import get_jwt, jwt_required
+from flask_jwt_extended import jwt_required
 from werkzeug.utils import secure_filename
 
+from app.models import Loan
 from app.services.file_service import FileService
+from app.services.loan_service import LoanService
 
 file_bp = Blueprint("file", __name__)
 file_service = FileService()
-
+loan_service = LoanService()
 
 @file_bp.route("/file/upload_files", methods=["POST"])
 @jwt_required()
@@ -21,9 +23,14 @@ def upload_files():
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
-        for file in files:
-            file_service.upload_file(data["loan_id"], secure_filename(file.filename), file)
+        loan = loan_service.get_loan(id=data["loan_id"])
 
+        for file in files:
+            file_service.upload_file(loan.id, secure_filename(file.filename), file)
+
+        if loan_service.essential_files_exists(loan) and loan.status == Loan.Status.MISSING_DOCUMENTS:
+            # TODO: set status to processing document and "process" them insead of skipping this step
+            loan_service.update_loan_status(data["loan_id"], Loan.Status.WAITING_FOR_OFFERS)
         return jsonify({"status": "OK"}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
