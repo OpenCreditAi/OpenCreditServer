@@ -14,6 +14,9 @@ class Offer(db.Model):
         ACCEPTED = 3
         REJECTED = 4
 
+        def closed(self):
+            return self in [self.ACCEPTED, self.REJECTED, self.EXPIRED]
+        
     __tablename__ = "offers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
