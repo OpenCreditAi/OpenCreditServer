@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+from typing import List
+
 from app import db
 from app.models import Loan, User
 
@@ -41,6 +44,25 @@ class LoanService:
             raise ValueError(f"No such loan with id ${loan_id}")
 
         loan.status = status
+        db.session.commit()
+
+
+    def process_loans(self, loans: List[Loan]):
+        """
+        time based processing of loans
+        TODO: Use "Computation Module" to process documents
+        :return:
+        """
+        for loan in loans:
+            # TODO: date need to add update date and base the EXPIRED status on that
+            if datetime.now() - loan.last_updated >= timedelta(days=30):
+                loan.status = Loan.Status.EXPIRED
+            elif datetime.now() - loan.last_updated >= timedelta(days=10):
+                if loan.status == Loan.Status.PROCESSING_DOCUMENTS:
+                    loan.status = Loan.Status.WAITING_FOR_OFFERS
+            else:
+                print("Less than 30 days have passed.")
+
         db.session.commit()
 
     def _essential_files_exists(self, files: list):

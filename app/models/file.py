@@ -2,9 +2,11 @@ import os
 from datetime import datetime, UTC
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint
+from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint, event
+from sqlalchemy import update as sqlalchemy_update
 
 from app import db
+from app.models.loan import Loan  # Adjust the import if needed
 
 
 class File(db.Model):
@@ -30,3 +32,15 @@ class File(db.Model):
         self.file_name = file_name
         self.file_basename = os.path.splitext(file_name)[0]  # Extract filename without extension
         self.url = url
+
+
+# 🔁 Event listeners to update Loan.last_updated on file insert/update/delete
+@event.listens_for(File, 'after_insert')
+@event.listens_for(File, 'after_update')
+@event.listens_for(File, 'after_delete')
+def update_loan_last_updated(mapper, connection, target):
+    connection.execute(
+        sqlalchemy_update(Loan.__table__)
+        .where(Loan.id == target.loan_id)
+        .values(last_updated=datetime.now(UTC))
+    )

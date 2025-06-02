@@ -29,9 +29,9 @@ class Loan(db.Model):
     address: Mapped[str]
     status = db.Column(SqlEnum(Status, name="status_enum", native_enum=False), nullable=False)
     amount: Mapped[int]  # Amount of money needed
-    created_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(UTC)
-    )  # Updated to use UTC
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))
+    last_updated: Mapped[datetime] = mapped_column(default=datetime.now(UTC), onupdate=datetime.now(UTC))
+
 
     user: Mapped["User"] = relationship(
         "User"
@@ -41,6 +41,7 @@ class Loan(db.Model):
     )
     files: Mapped[List["File"]] = relationship("File", back_populates="loan")
     offers: Mapped[List["Offer"]] = relationship("Offer", back_populates="loan")
+
 
     def to_dict(self):
         return {
