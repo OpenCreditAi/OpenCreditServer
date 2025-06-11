@@ -22,4 +22,5 @@ python-dotenv==1.0.0
 SQLAlchemy==2.0.39
 typing_extensions==4.12.2
 Werkzeug==2.3.7
+apscheduler==3.11.0
 gunicorn==21.2.0

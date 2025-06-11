@@ -1,5 +1,6 @@
 import os
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -51,5 +52,24 @@ def create_app():
         if Config.ADD_STATIC_OFFERS:
             from .populate_db import populate
             populate()
+
+
+        # Schedule loan processing
+        def scheduled_process_loans():
+            with app.app_context():
+                from .services.loan_service import LoanService
+                from .models.loan import Loan
+                loans = Loan.query.all()
+                LoanService().process_loans(loans)
+
+        # Scheduler
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(scheduled_process_loans, 'cron', hour=0, minute=0)  # Midnight
+        scheduler.start()
+
+        # Ensure scheduler shuts down on exit
+        import atexit
+        atexit.register(lambda: scheduler.shutdown())
+
 
     return app

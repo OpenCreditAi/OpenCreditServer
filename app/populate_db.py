@@ -163,7 +163,7 @@ offers_data = [
         "offer_amount": 2500000,
         "interest_rate": 5,
         "offer_terms": "7 years, monthly payments",
-        "status": "Accepted",
+        "status": "ACCEPTED",
         "repayment_period": 84,
     },
     {
@@ -174,7 +174,7 @@ offers_data = [
         "offer_amount": 1750000,
         "interest_rate": 5.5,
         "offer_terms": "6 years, quarterly payments",
-        "status": "Pending",
+        "status": "PENDING_BORROWER",
         "repayment_period": 72,
     },
     
@@ -187,7 +187,7 @@ offers_data = [
         "offer_amount": 5000000,
         "interest_rate": 6,
         "offer_terms": "5 years, monthly payments",
-        "status": "Denied",
+        "status": "REJECTED",
         "repayment_period": 60,
     },
     {
@@ -198,7 +198,7 @@ offers_data = [
         "offer_amount": 4500000,
         "interest_rate": 5.5,
         "offer_terms": "7 years, quarterly payments",
-        "status": "Accepted",
+        "status": "ACCEPTED",
         "repayment_period": 84,
     },
     
@@ -211,7 +211,7 @@ offers_data = [
         "offer_amount": 5000000,
         "interest_rate": 4.5,
         "offer_terms": "10 years, annual payments",
-        "status": "Pending",
+        "status": "PENDING_BORROWER",
         "repayment_period": 120,
     },
     {
@@ -222,7 +222,7 @@ offers_data = [
         "offer_amount": 6000000,
         "interest_rate": 5,
         "offer_terms": "6 years, monthly payments",
-        "status": "Denied",
+        "status": "REJECTED",
         "repayment_period": 72,
     },    
     # Loan 16 (בית יוקרה ברמת גן)
@@ -234,7 +234,7 @@ offers_data = [
         "offer_amount": 10000000,
         "interest_rate": 5,
         "offer_terms": "6 years, monthly payments",
-        "status": "Accepted",
+        "status": "ACCEPTED",
         "repayment_period": 72,
     },
     
@@ -247,7 +247,7 @@ offers_data = [
         "offer_amount": 25000000,
         "interest_rate": 6,
         "offer_terms": "7 years, monthly payments",
-        "status": "Pending",
+        "status": "PENDING_BORROWER",
         "repayment_period": 84,
     },
     
@@ -260,7 +260,7 @@ offers_data = [
         "offer_amount": 30000000,
         "interest_rate": 6.5,
         "offer_terms": "6 years, quarterly payments",
-        "status": "Denied",
+        "status": "REJECTED",
         "repayment_period": 72,
     },
     
@@ -273,7 +273,7 @@ offers_data = [
         "offer_amount": 40000000,
         "interest_rate": 5.25,
         "offer_terms": "8 years, monthly payments",
-        "status": "Accepted",
+        "status": "ACCEPTED",
         "repayment_period": 96,
     },
     
@@ -286,7 +286,7 @@ offers_data = [
         "offer_amount": 50000000,
         "interest_rate": 5.25,
         "offer_terms": "10 years, monthly payments",
-        "status": "Accepted",
+        "status": "ACCEPTED",
         "repayment_period": 120,
     },
     {
@@ -297,7 +297,7 @@ offers_data = [
         "offer_amount": 48000000,
         "interest_rate": 5.75,
         "offer_terms": "9 years, quarterly payments",
-        "status": "Pending",
+        "status": "PENDING_FINANCIER",
         "repayment_period": 108,
     },
     {
@@ -308,7 +308,7 @@ offers_data = [
         "offer_amount": 10000000,
         "interest_rate": 5.2,
         "offer_terms": "6 years, monthly payments",
-        "status": "Accepted",
+        "status": "ACCEPTED",
         "repayment_period": 72,
     },
     {
@@ -319,7 +319,7 @@ offers_data = [
         "offer_amount": 7500000,
         "interest_rate": 5.9,
         "offer_terms": "10 years, monthly payments",
-        "status": "Accepted",
+        "status": "ACCEPTED",
         "repayment_period": 120,
     },
     {
@@ -330,7 +330,7 @@ offers_data = [
         "offer_amount": 5000000,
         "interest_rate": 5.2,
         "offer_terms": "6 years, monthly payments",
-        "status": "Pending",
+        "status": "PENDING_FINANCIER",
         "repayment_period": 72,
     },
     {
@@ -341,7 +341,7 @@ offers_data = [
         "offer_amount": 40000000,
         "interest_rate": 6.3,
         "offer_terms": "10 years, annual payments",
-        "status": "Pending",
+        "status": "PENDING_FINANCIER",
         "repayment_period": 120,
     }
 ]
@@ -399,7 +399,7 @@ def populate_loans():
             project_name=loan_data["project_name"],
             address=loan_data["address"],
             amount=loan_data["amount"],
-            status=Loan.Status.PROCESSING_DOCUMENTS,
+            status=Loan.Status.MISSING_DOCUMENTS,
         )
         loans.append(loan)
 

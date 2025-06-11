@@ -8,12 +8,15 @@ from sqlalchemy import Enum as SqlEnum
 
 class Offer(db.Model):
     class Status(IntEnum):
-        PENDING_FINANCIER = 1
-        PENDING_BORROWER = 2
-        EXPIRED = 3
-        ACCEPTED = 4
-        REJECTED = 5
+        PENDING_FINANCIER = 0
+        PENDING_BORROWER = 1
+        EXPIRED = 2
+        ACCEPTED = 3
+        REJECTED = 4
 
+        def closed(self):
+            return self in [self.ACCEPTED, self.REJECTED, self.EXPIRED]
+        
     __tablename__ = "offers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -40,9 +43,10 @@ class Offer(db.Model):
             "loan_id": self.loan_id,
             "user_id": self.user_id,
             "organization_id": self.organization_id,
+            "organization_name": self.organization.name,
             "offer_amount": self.offer_amount,
             "interest_rate": self.interest_rate,
             "offer_terms": self.offer_terms,
-            "status": self.status,
+            "status": self.status.name,
             "repayment_period": self.repayment_period,
         }

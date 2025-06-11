@@ -51,6 +51,22 @@ class OfferService:
         try:
             offer: Offer = Offer.query.get(id)
             offer.status = Offer.Status.ACCEPTED
+            loan: Loan = offer.loan
+
+            offers_money_sum = 0
+            closed_offers_count = 0
+
+            for loan_offer in loan.offers:
+                if loan_offer.status.closed():
+                    closed_offers_count += 1
+                if loan_offer.status == Offer.Status.ACCEPTED:
+                    offers_money_sum += loan_offer.offer_amount
+
+            if offers_money_sum >= loan.amount:
+                loan.status = Loan.Status.ACTIVE_LOAN
+            else:
+                loan.status = Loan.Status.PENDING_OFFERS if len(loan.offers) > closed_offers_count else Loan.Status.WAITING_FOR_OFFERS
+
             db.session.commit()
             return (
                 jsonify(
@@ -70,7 +86,15 @@ class OfferService:
         try:
             offer: Offer = Offer.query.get(id)
             offer.status = Offer.Status.REJECTED
+
+            if any((not o.status.closed()) for o in offer.loan.offers):
+                offer.loan.status = Loan.Status.PENDING_OFFERS
+            else:
+                offer.loan.status = Loan.Status.WAITING_FOR_OFFERS
+
             db.session.commit()
+
+
             return (
                 jsonify(
                     {
