@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+import math
 from typing import List
 
 from app import db
 from app.models import Loan, User
+from app.models.offer import Offer
 
 
 class LoanService:
@@ -31,8 +33,61 @@ class LoanService:
         else:
             return Loan.query.filter_by(organization_id=user.organization_id)
 
-    def get_marketplace_loans(self):
-        return Loan.query.all()
+    def get_marketplace_loans(self, email):
+        user: User = User.query.filter_by(email=email).first()
+        pastOffers: list[Offer] = user.organization.offers
+        loans: list[Loan] = Loan.query.all()
+
+        loan_scores = [
+            (loan, self.compute_loan_score(loan, loans, pastOffers)) for loan in loans
+        ]
+
+        # Compute average score for score_cutoff
+        if loan_scores:
+            avg_score = sum(score for _, score in loan_scores) / len(loan_scores)
+        else:
+            avg_score = 0
+
+        loan_scores.sort(key=lambda x: x[1], reverse=True)
+
+        for idx, (loan, score) in enumerate(loan_scores, start=1):
+            if score >= avg_score:
+                loan.recommendation_order = idx
+            else:
+                loan.recommendation_order = None
+
+        return loans
+
+    def compute_loan_score(
+        self, loan: Loan, loans: list[Loan], pastOffers: list[Offer]
+    ) -> int:
+        score = 0
+
+        for pastOffer in pastOffers:
+            if loan.project_type == pastOffer.loan.project_type:
+                score += 3
+
+            rel_diff = abs(loan.amount - pastOffer.loan.amount) / (
+                (loan.amount + pastOffer.loan.amount) / 2
+            )
+
+            if rel_diff < 0.1:  # within 10%
+                score += 2
+            elif rel_diff < 0.2:  # within 20%
+                score += 1
+
+            if loan.get_city() == pastOffer.loan.get_city():
+                score += 1
+
+        successful_loans = [
+            pastLoan
+            for pastLoan in loans
+            if pastLoan.organization_id == loan.organization_id
+            and pastLoan.status == Loan.Status.PAID
+        ]
+        score += math.floor(math.log1p(len(successful_loans)) * 2)
+
+        return score
 
     def get_loan(self, id):
         return Loan.query.get(id)
@@ -45,7 +100,6 @@ class LoanService:
 
         loan.status = status
         db.session.commit()
-
 
     def process_loans(self, loans: List[Loan]):
         """
@@ -66,19 +120,20 @@ class LoanService:
         db.session.commit()
 
     def _essential_files_exists(self, files: list):
-        essential_files = ["tabo_document",
-                           "united_home_document",
-                           "original_tama_document",
-                           "project_list_document",
-                           "company_crt_document",
-                           "tama_addons_document",
-                           "reject_status_document",
-                           "building_permit",
-                           "objection_status",
-                           "zero_document",
-                           "bank_account_confirm_document"]
+        essential_files = [
+            "tabo_document",
+            "united_home_document",
+            "original_tama_document",
+            "project_list_document",
+            "company_crt_document",
+            "tama_addons_document",
+            "reject_status_document",
+            "building_permit",
+            "objection_status",
+            "zero_document",
+            "bank_account_confirm_document",
+        ]
         file_names = [file.file_basename for file in files]
-
 
         for essential in essential_files:
             if not (essential in file_names):

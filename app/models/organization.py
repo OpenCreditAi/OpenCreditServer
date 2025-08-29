@@ -3,6 +3,7 @@ from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app import db
+from app.models.offer import Offer
 
 
 class Organization(db.Model):

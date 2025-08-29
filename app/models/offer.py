@@ -5,6 +5,8 @@ from app import db
 from enum import IntEnum
 from sqlalchemy import Enum as SqlEnum
 
+from app.models.loan import Loan
+
 
 class Offer(db.Model):
     class Status(IntEnum):

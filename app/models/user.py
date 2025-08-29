@@ -5,6 +5,7 @@ from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app import db
+from app.models.organization import Organization
 
 
 class User(db.Model):
@@ -40,5 +41,4 @@ class User(db.Model):
             "phone_number": self.phone_number,
             "role": self.role,
             "organization": self.organization.name,
-
         }

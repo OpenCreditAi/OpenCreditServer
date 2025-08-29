@@ -28,7 +28,6 @@ def create_loan():
             project_name=data["project_name"],
             address=data["address"],
             amount=data["amount"],
-
         )
         return jsonify({"id": loan.id}), 201
     except ValueError as e:
@@ -57,9 +56,13 @@ def get_loans():
 @loan_bp.route("/loans/marketplace", methods=["GET"])
 @jwt_required()
 def get_marketplace_loans():
+    current_user = get_jwt()
+
+    if "email" not in current_user.keys():
+        return jsonify({"error": "Missing email in jwt"}), 400
 
     try:
-        loans = loan_service.get_marketplace_loans()
+        loans = loan_service.get_marketplace_loans(email=current_user["email"])
 
         return (
             jsonify({"loans": [loan.to_dict() for loan in loans]}),

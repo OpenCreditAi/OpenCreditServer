@@ -27,11 +27,15 @@ class Loan(db.Model):
     project_type: Mapped[str]
     project_name: Mapped[str]
     address: Mapped[str]
-    status = db.Column(SqlEnum(Status, name="status_enum", native_enum=False), nullable=False)
+    status = db.Column(
+        SqlEnum(Status, name="status_enum", native_enum=False), nullable=False
+    )
     amount: Mapped[int]  # Amount of money needed
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))
-    last_updated: Mapped[datetime] = mapped_column(default=datetime.now(UTC), onupdate=datetime.now(UTC))
-
+    last_updated: Mapped[datetime] = mapped_column(
+        default=datetime.now(UTC), onupdate=datetime.now(UTC)
+    )
+    _recommendation_order = None
 
     user: Mapped["User"] = relationship(
         "User"
@@ -42,6 +46,13 @@ class Loan(db.Model):
     files: Mapped[List["File"]] = relationship("File", back_populates="loan")
     offers: Mapped[List["Offer"]] = relationship("Offer", back_populates="loan")
 
+    @property
+    def recommendation_order(self) -> int | None:
+        return self._recommendation_order
+
+    @recommendation_order.setter
+    def recommendation_order(self, value: int | None):
+        self._recommendation_order = value
 
     def to_dict(self):
         return {
@@ -54,5 +65,10 @@ class Loan(db.Model):
             "status": self.status,
             "created_at": self.created_at,
             "organization_name": self.organization.name,
-            "file_names": [file.file_basename for file in self.files]
+            "recommendation_order": self.recommendation_order,
+            "file_names": [file.file_basename for file in self.files],
         }
+
+    def get_city(self) -> str:
+        parts = [p.strip() for p in self.address.split(",")]
+        return parts[-1].strip() if parts else None
