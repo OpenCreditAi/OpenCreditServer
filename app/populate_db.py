@@ -158,7 +158,7 @@ offers_data = [
     {
         "id": 1,
         "loan_id": 11,
-        "user_id": 12,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 2500000,
         "interest_rate": 5,
@@ -169,7 +169,7 @@ offers_data = [
     {
         "id": 2,
         "loan_id": 11,
-        "user_id": 14,
+        "user_id": 13,
         "organization_id": 13,
         "offer_amount": 1750000,
         "interest_rate": 5.5,
@@ -182,7 +182,7 @@ offers_data = [
     {
         "id": 3,
         "loan_id": 12,
-        "user_id": 12,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 5000000,
         "interest_rate": 6,
@@ -193,7 +193,7 @@ offers_data = [
     {
         "id": 4,
         "loan_id": 12,
-        "user_id": 14,
+        "user_id": 15,
         "organization_id": 13,
         "offer_amount": 4500000,
         "interest_rate": 5.5,
@@ -206,7 +206,7 @@ offers_data = [
     {
         "id": 5,
         "loan_id": 13,
-        "user_id": 12,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 5000000,
         "interest_rate": 4.5,
@@ -217,7 +217,7 @@ offers_data = [
     {
         "id": 6,
         "loan_id": 13,
-        "user_id": 14,
+        "user_id": 13,
         "organization_id": 13,
         "offer_amount": 6000000,
         "interest_rate": 5,
@@ -229,7 +229,7 @@ offers_data = [
     {
         "id": 9,
         "loan_id": 16,
-        "user_id": 12,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 10000000,
         "interest_rate": 5,
@@ -242,7 +242,7 @@ offers_data = [
     {
         "id": 11,
         "loan_id": 17,
-        "user_id": 14,
+        "user_id": 15,
         "organization_id": 13,
         "offer_amount": 25000000,
         "interest_rate": 6,
@@ -255,7 +255,7 @@ offers_data = [
     {
         "id": 12,
         "loan_id": 18,
-        "user_id": 12,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 30000000,
         "interest_rate": 6.5,
@@ -268,7 +268,7 @@ offers_data = [
     {
         "id": 13,
         "loan_id": 19,
-        "user_id": 12,
+        "user_id": 13,
         "organization_id": 13,
         "offer_amount": 40000000,
         "interest_rate": 5.25,
@@ -281,7 +281,7 @@ offers_data = [
     {
         "id": 14,
         "loan_id": 20,
-        "user_id": 12,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 50000000,
         "interest_rate": 5.25,
@@ -292,7 +292,7 @@ offers_data = [
     {
         "id": 15,
         "loan_id": 20,
-        "user_id": 14,
+        "user_id": 15,
         "organization_id": 13,
         "offer_amount": 48000000,
         "interest_rate": 5.75,
@@ -303,7 +303,7 @@ offers_data = [
     {
         "id": 19,
         "loan_id": 14,
-        "user_id": 12,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 10000000,
         "interest_rate": 5.2,
@@ -314,7 +314,7 @@ offers_data = [
     {
         "id": 21,
         "loan_id": 16,
-        "user_id": 14,
+        "user_id": 13,
         "organization_id": 13,
         "offer_amount": 7500000,
         "interest_rate": 5.9,
@@ -325,7 +325,7 @@ offers_data = [
     {
         "id": 22,
         "loan_id": 17,
-        "user_id": 14,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 5000000,
         "interest_rate": 5.2,
@@ -336,7 +336,7 @@ offers_data = [
     {
         "id": 24,
         "loan_id": 19,
-        "user_id": 14,
+        "user_id": 11,
         "organization_id": 11,
         "offer_amount": 40000000,
         "interest_rate": 6.3,
