@@ -8,6 +8,9 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     libpq-dev \
     gcc \
+    poppler-utils \
+    libreoffice \
+    libreoffice-common \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements.txt first for better caching
