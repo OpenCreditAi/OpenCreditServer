@@ -43,6 +43,7 @@ ACCEPTED_DOC_TYPES = {
     "loan_agreement",
     "appraisal",
     "account_confirmation",   # אישור ניהול חשבון (often required in Israel)
+    "building_permit",
 }
 
 DOC_CLASSIFY_THRESHOLD = 3.2   # slightly stricter after adding bonuses/penalties
@@ -210,4 +211,21 @@ FINRE_REGEX.update({
     "il_account_triplet": re.compile(r"\b\d{2}-\d{3}-\d{1,9}\b"),
     # URLs sometimes appear on headed paper
     "has_url":           re.compile(r"https?://[^\s]+", re.I),
+})
+
+FINRE_KW["building_permit"] = {
+    "he": [
+        "היתר בניה", "בקשה להיתר", "תיק בניין",
+        "ועדה מקומית לתכנון ובניה", "תוספת בניה",
+        "חוק התכנון והבניה", "תכניות נוספות"
+    ],
+    "en": [
+        "building permit", "construction permit", "planning committee",
+        "zoning permit", "construction license"
+    ],
+}
+
+FINRE_REGEX.update({
+    "building_permit_he": re.compile(r"היתר\s*בניה"),
+    "building_law_he": re.compile(r"חוק\s*התכנון\s*והבניה"),
 })

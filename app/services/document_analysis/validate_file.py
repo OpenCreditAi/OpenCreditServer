@@ -192,6 +192,16 @@ def classify_document(text: str, label_conf: float):
         # Letters rarely have transaction tables — give a small bonus when tables are absent
         if not bank_table and amounts <= 2:
             score["account_confirmation"] += 0.5
+    if "building_permit" in score:
+        if FINRE_REGEX["building_permit_he"].search(text):
+            score["building_permit"] += 1.5
+        if FINRE_REGEX["building_law_he"].search(text):
+            score["building_permit"] += 0.8
+        # Bonus for presence of "ועדה מקומית לתכנון ובניה"
+        if "ועדה מקומית" in text:
+            score["building_permit"] += 1.0
+        # These permits list גוש/חלקה too, so piggyback on that
+        score["building_permit"] += min(2, cm("parcel_block")) * 0.4
 
     # ---- Vision label bonus (capped, smaller) ----
     bonus = min(0.6, label_conf)
