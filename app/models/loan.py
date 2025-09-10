@@ -5,6 +5,7 @@ from typing import List
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Enum as SqlEnum
+from app.models.message import Message
 
 from app import db
 
@@ -40,11 +41,10 @@ class Loan(db.Model):
     user: Mapped["User"] = relationship(
         "User"
     )  # No back_populates since user does not own offers - organization does
-    organization: Mapped["Organization"] = relationship(
-        "Organization", back_populates="loans"
-    )
+    organization: Mapped["Organization"] = relationship("Organization", back_populates="loans")
     files: Mapped[List["File"]] = relationship("File", back_populates="loan")
     offers: Mapped[List["Offer"]] = relationship("Offer", back_populates="loan")
+    chat: Mapped[List["Message"]] = relationship("Message", back_populates="loan",cascade="all, delete-orphan")
 
     @property
     def recommendation_order(self) -> int | None:
