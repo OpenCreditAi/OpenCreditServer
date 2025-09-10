@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required
 from werkzeug.utils import secure_filename
 
 from app.models import Loan
+from app.services.document_analysis.validate_file import validate_file
 from app.services.file_service import FileService
 from app.services.loan_service import LoanService
 
@@ -25,12 +26,27 @@ def upload_files():
     try:
         loan = loan_service.get_loan(id=data["loan_id"])
 
+        unaccepted_files = []
+
         for file in files:
+            if not validate_file(file):
+                unaccepted_files.append(file.filename)
+                continue
+
+            # Save only if validation passed
             file_service.upload_file(loan.id, secure_filename(file.filename), file)
 
+        # If any failed validation → return error with list
+        if unaccepted_files:
+            return jsonify({
+                "error": f"error code 415: the following files are not following our guidelines: {unaccepted_files}",
+                "unaccepted_files": unaccepted_files
+            }), 415
+
+        # If all passed → proceed
         if loan_service.essential_files_exists(loan) and loan.status == Loan.Status.MISSING_DOCUMENTS:
-            # TODO: set status to processing document and "process" them insead of skipping this step
             loan_service.update_loan_status(data["loan_id"], Loan.Status.WAITING_FOR_OFFERS)
+
         return jsonify({"status": "OK"}), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
