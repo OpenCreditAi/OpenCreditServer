@@ -18,7 +18,7 @@ class Offer(db.Model):
 
         def closed(self):
             return self in [self.ACCEPTED, self.REJECTED, self.EXPIRED]
-        
+
     __tablename__ = "offers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -32,12 +32,8 @@ class Offer(db.Model):
     repayment_period: Mapped[int]
 
     loan: Mapped["Loan"] = relationship("Loan", back_populates="offers")
-    user: Mapped["User"] = relationship(
-        "User"
-    )  # No back_populates since user does not own offers - organization does
-    organization: Mapped["Organization"] = relationship(
-        "Organization", back_populates="offers"
-    )
+    user: Mapped["User"] = relationship("User")  # No back_populates since user does not own offers - organization does
+    organization: Mapped["Organization"] = relationship("Organization", back_populates="offers")
 
     def to_dict(self):
         return {

@@ -30,11 +30,13 @@ def create_app():
         from .routes.file import file_bp
         from .routes.loan import loan_bp
         from .routes.offer import offer_bp
+        from .routes.chat import chat_bp
 
         app.register_blueprint(auth_bp)
         app.register_blueprint(loan_bp)
         app.register_blueprint(file_bp)
         app.register_blueprint(offer_bp)
+        app.register_blueprint(chat_bp)
 
 
         # Import models to ensure they're registered with SQLAlchemy
