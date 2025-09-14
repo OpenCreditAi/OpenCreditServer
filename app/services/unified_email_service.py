@@ -43,10 +43,10 @@ class UnifiedEmailService:
             logger.error(f"Failed to send email via {self.provider}: {e}")
             return False
     
-    def send_loan_status_notification(self, loan_data: Dict[str, Any], old_status: str, new_status: str) -> bool:
+    def send_loan_status_notification(self, loan_data: Dict[str, Any], old_status: str, new_status: str, recipient_type: str = "borrower") -> bool:
         """Send loan status change notification"""
         try:
-            return self._service.send_loan_status_notification(loan_data, old_status, new_status)
+            return self._service.send_loan_status_notification(loan_data, old_status, new_status, recipient_type)
         except Exception as e:
             logger.error(f"Failed to send loan status notification via {self.provider}: {e}")
             return False

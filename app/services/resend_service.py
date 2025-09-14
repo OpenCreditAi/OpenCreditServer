@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 from typing import Optional, Dict, Any
 from flask import current_app
 
@@ -49,6 +50,9 @@ class ResendService:
             if text_content:
                 params["text"] = text_content
             
+            # Add small delay to respect rate limits
+            time.sleep(0.6)  # Wait 600ms between requests (allows 1.67 requests/second)
+            
             response = resend.Emails.send(params)
             
             if response and isinstance(response, dict) and 'id' in response:
@@ -65,7 +69,7 @@ class ResendService:
             traceback.print_exc()
             return False
     
-    def send_loan_status_notification(self, loan_data: Dict[str, Any], old_status: str, new_status: str) -> bool:
+    def send_loan_status_notification(self, loan_data: Dict[str, Any], old_status: str, new_status: str, recipient_type: str = "borrower") -> bool:
         """
         Send loan status change notification email using Resend
         """
@@ -75,14 +79,26 @@ class ResendService:
         # Create a temporary EmailService instance to generate templates
         temp_email_service = EmailService()
         
+        # Determine recipient email and name based on type
+        if recipient_type == "financier":
+            recipient_email = loan_data.get('financier_email')
+            recipient_name = loan_data.get('financier_name', 'Financier')
+        else:  # borrower
+            recipient_email = loan_data.get('borrower_email')
+            recipient_name = loan_data.get('borrower_name', 'Borrower')
+        
+        if not recipient_email:
+            logger.warning(f"No {recipient_type} email found for loan status notification")
+            return False
+        
         # Generate email content
         if new_status == "PAID":
             subject = "🎉 הלוואה שולמה בהצלחה! - OpenCredit"
-            html_content = temp_email_service._generate_paid_email_template(loan_data, old_status, new_status)
+            html_content = temp_email_service._generate_paid_email_template(loan_data, old_status, new_status, recipient_type)
         else:
             subject = f"עדכון סטטוס הלוואה - OpenCredit"
-            html_content = temp_email_service._generate_status_change_email_template(loan_data, old_status, new_status)
+            html_content = temp_email_service._generate_status_change_email_template(loan_data, old_status, new_status, recipient_type)
         
-        text_content = temp_email_service._generate_text_content(loan_data, old_status, new_status)
+        text_content = temp_email_service._generate_text_content(loan_data, old_status, new_status, recipient_type)
         
-        return self.send_email(loan_data['borrower_email'], subject, html_content, text_content)
+        return self.send_email(recipient_email, subject, html_content, text_content)

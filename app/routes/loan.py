@@ -111,13 +111,26 @@ def update_loan_status(id):
         
         # Check if user has permission to update this loan
         user_email = current_user["email"]
-        if loan.user.email != user_email and loan.organization.users.filter_by(email=user_email).first() is None:
+        # Check if user is the borrower or a member of the organization
+        is_authorized = (loan.user.email == user_email or 
+                        any(user.email == user_email for user in loan.organization.users))
+        if not is_authorized:
             return jsonify({"error": "Unauthorized to update this loan"}), 403
         
-        # Validate status
+        # Validate status - handle both string names and numeric values
         try:
-            new_status = Loan.Status(data["status"])
-        except ValueError:
+            status_value = data["status"]
+            
+            # If it's a string, try to find by name
+            if isinstance(status_value, str):
+                new_status = Loan.Status[status_value]
+            # If it's a number, try to find by value
+            elif isinstance(status_value, (int, float)):
+                new_status = Loan.Status(int(status_value))
+            else:
+                raise ValueError("Status must be string or number")
+                
+        except (ValueError, KeyError):
             valid_statuses = [status.name for status in Loan.Status]
             return jsonify({"error": f"Invalid status. Valid statuses: {valid_statuses}"}), 400
         
@@ -128,33 +141,78 @@ def update_loan_status(id):
         loan_service.update_loan_status(id, new_status)
         
         # Prepare loan data for email
+        # Get financier email from organization users (first user with financier role)
+        financier_email = None
+        financier_name = loan.organization.name
+        
+        # Try to find a financier user in the organization
+        for user in loan.organization.users:
+            if hasattr(user, 'role') and user.role == 'financier':
+                financier_email = user.email
+                financier_name = user.full_name
+                break
+        
+        # If no financier found, use the first user's email or a default
+        if not financier_email and loan.organization.users:
+            financier_email = loan.organization.users[0].email
+            financier_name = loan.organization.users[0].full_name
+        
         loan_data = {
             "project_name": loan.project_name,
             "amount": loan.amount,
-            "borrower_name": loan.user.name,
+            "borrower_name": loan.user.full_name,
             "borrower_email": loan.user.email,
+            "financier_name": financier_name,
+            "financier_email": financier_email,
             "updated_at": datetime.now(UTC).strftime("%d/%m/%Y %H:%M")
         }
         
-        # Send email notification
-        try:
-            email_sent = email_service.send_loan_status_notification(
-                loan_data, old_status, new_status.name
-            )
-            if email_sent:
-                print(f"Email notification sent for loan {id} status change: {old_status} -> {new_status.name}")
-            else:
-                print(f"Failed to send email notification for loan {id}")
-        except Exception as e:
-            print(f"Error sending email notification for loan {id}: {str(e)}")
-            # Don't fail the request if email fails
+        # Send email notifications to both parties
+        borrower_email_sent = False
+        financier_email_sent = False
+        
+        # Send email to borrower
+        if loan_data.get('borrower_email'):
+            try:
+                borrower_email_sent = email_service.send_loan_status_notification(
+                    loan_data, old_status, new_status.name, recipient_type="borrower"
+                )
+                if borrower_email_sent:
+                    print(f"Email notification sent to borrower for loan {id} status change: {old_status} -> {new_status.name}")
+                else:
+                    print(f"Failed to send email notification to borrower for loan {id}")
+            except Exception as e:
+                print(f"Error sending email notification to borrower for loan {id}: {str(e)}")
+                borrower_email_sent = False
+        else:
+            print(f"No borrower email found for loan {id}")
+            borrower_email_sent = False
+        
+        # Send email to financier
+        if loan_data.get('financier_email'):
+            try:
+                financier_email_sent = email_service.send_loan_status_notification(
+                    loan_data, old_status, new_status.name, recipient_type="financier"
+                )
+                if financier_email_sent:
+                    print(f"Email notification sent to financier for loan {id} status change: {old_status} -> {new_status.name}")
+                else:
+                    print(f"Failed to send email notification to financier for loan {id}")
+            except Exception as e:
+                print(f"Error sending email notification to financier for loan {id}: {str(e)}")
+                financier_email_sent = False
+        else:
+            print(f"No financier email found for loan {id}")
+            financier_email_sent = False
         
         return jsonify({
             "message": "Loan status updated successfully",
             "loan_id": id,
             "old_status": old_status,
             "new_status": new_status.name,
-            "email_sent": email_sent if 'email_sent' in locals() else False
+            "borrower_email_sent": borrower_email_sent,
+            "financier_email_sent": financier_email_sent,
+            "emails_sent": borrower_email_sent or financier_email_sent
         }), 200
         
     except ValueError as e:

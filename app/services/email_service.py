@@ -64,7 +64,7 @@ class EmailService:
             logger.error(f"Failed to send email to {to_email}: {str(e)}")
             return False
     
-    def send_loan_status_notification(self, loan_data: Dict[str, Any], old_status: str, new_status: str) -> bool:
+    def send_loan_status_notification(self, loan_data: Dict[str, Any], old_status: str, new_status: str, recipient_type: str = "borrower") -> bool:
         """
         Send loan status change notification email
         
@@ -76,29 +76,45 @@ class EmailService:
         Returns:
             bool: True if email sent successfully, False otherwise
         """
-        # Get recipient email (borrower)
-        borrower_email = loan_data.get('borrower_email')
-        if not borrower_email:
-            logger.warning("No borrower email found for loan status notification")
+        # Get recipient email based on type
+        if recipient_type == "financier":
+            recipient_email = loan_data.get('financier_email')
+            recipient_name = loan_data.get('financier_name', 'Financier')
+        else:  # borrower
+            recipient_email = loan_data.get('borrower_email')
+            recipient_name = loan_data.get('borrower_name', 'Borrower')
+        
+        if not recipient_email:
+            logger.warning(f"No {recipient_type} email found for loan status notification")
             return False
             
         # Generate email content based on status
         if new_status == "PAID":
             subject = "🎉 הלוואה שולמה בהצלחה! - OpenCredit"
-            html_content = self._generate_paid_email_template(loan_data, old_status, new_status)
+            html_content = self._generate_paid_email_template(loan_data, old_status, new_status, recipient_type)
         else:
             subject = f"עדכון סטטוס הלוואה - OpenCredit"
-            html_content = self._generate_status_change_email_template(loan_data, old_status, new_status)
+            html_content = self._generate_status_change_email_template(loan_data, old_status, new_status, recipient_type)
             
-        text_content = self._generate_text_content(loan_data, old_status, new_status)
+        text_content = self._generate_text_content(loan_data, old_status, new_status, recipient_type)
         
-        return self.send_email(borrower_email, subject, html_content, text_content)
+        return self.send_email(recipient_email, subject, html_content, text_content)
     
-    def _generate_paid_email_template(self, loan_data: Dict[str, Any], old_status: str, new_status: str) -> str:
+    def _generate_paid_email_template(self, loan_data: Dict[str, Any], old_status: str, new_status: str, recipient_type: str = "borrower") -> str:
         """Generate HTML template for PAID status email"""
         project_name = loan_data.get('project_name', 'הפרויקט שלך')
         amount = loan_data.get('amount', 0)
         formatted_amount = f"{amount:,}" if amount else "0"
+        
+        # Personalize greeting based on recipient type
+        if recipient_type == "financier":
+            recipient_name = loan_data.get('financier_name', 'Financier')
+            greeting = f"שלום {recipient_name},"
+            message = f"אנו שמחים להודיע לך שהלוואה שהענקת שולמה בהצלחה! 🎊"
+        else:  # borrower
+            recipient_name = loan_data.get('borrower_name', 'יקר/ה')
+            greeting = f"שלום {recipient_name},"
+            message = f"אנו שמחים להודיע לך שהלוואה שלך שולמה בהצלחה! 🎊"
         
         return f"""
         <!DOCTYPE html>
@@ -221,9 +237,9 @@ class EmailService:
                 </div>
                 
                 <div class="content">
-                    <p>שלום {loan_data.get('borrower_name', 'יקר/ה')},</p>
+                    <p>{greeting}</p>
                     
-                    <p>אנו שמחים להודיע לך שהלוואה שלך שולמה בהצלחה! 🎊</p>
+                    <p>{message}</p>
                     
                     <div class="loan-details">
                         <h3 style="margin-top: 0; color: #4CAF50;">פרטי ההלוואה</h3>
@@ -261,11 +277,19 @@ class EmailService:
         </html>
         """
     
-    def _generate_status_change_email_template(self, loan_data: Dict[str, Any], old_status: str, new_status: str) -> str:
+    def _generate_status_change_email_template(self, loan_data: Dict[str, Any], old_status: str, new_status: str, recipient_type: str = "borrower") -> str:
         """Generate HTML template for general status change email"""
         project_name = loan_data.get('project_name', 'הפרויקט שלך')
         amount = loan_data.get('amount', 0)
         formatted_amount = f"{amount:,}" if amount else "0"
+        
+        # Personalize greeting based on recipient type
+        if recipient_type == "financier":
+            recipient_name = loan_data.get('financier_name', 'Financier')
+            greeting = f"שלום {recipient_name},"
+        else:  # borrower
+            recipient_name = loan_data.get('borrower_name', 'יקר/ה')
+            greeting = f"שלום {recipient_name},"
         
         status_messages = {
             "PROCESSING_DOCUMENTS": "מעבד מסמכים",
@@ -399,7 +423,7 @@ class EmailService:
                 </div>
                 
                 <div class="content">
-                    <p>שלום {loan_data.get('borrower_name', 'יקר/ה')},</p>
+                    <p>{greeting}</p>
                     
                     <p>אנו מעדכנים אותך על שינוי בסטטוס ההלוואה שלך:</p>
                     
@@ -439,17 +463,25 @@ class EmailService:
         </html>
         """
     
-    def _generate_text_content(self, loan_data: Dict[str, Any], old_status: str, new_status: str) -> str:
+    def _generate_text_content(self, loan_data: Dict[str, Any], old_status: str, new_status: str, recipient_type: str = "borrower") -> str:
         """Generate plain text content for email"""
         project_name = loan_data.get('project_name', 'הפרויקט שלך')
         amount = loan_data.get('amount', 0)
         formatted_amount = f"{amount:,}" if amount else "0"
         
+        # Personalize greeting based on recipient type
+        if recipient_type == "financier":
+            recipient_name = loan_data.get('financier_name', 'Financier')
+            greeting = f"שלום {recipient_name},"
+        else:  # borrower
+            recipient_name = loan_data.get('borrower_name', 'יקר/ה')
+            greeting = f"שלום {recipient_name},"
+        
         if new_status == "PAID":
             return f"""
             הלוואה שולמה בהצלחה! 🎉
             
-            שלום {loan_data.get('borrower_name', 'יקר/ה')},
+            {greeting}
             
             אנו שמחים להודיע לך שהלוואה שלך שולמה בהצלחה!
             
@@ -481,7 +513,7 @@ class EmailService:
             return f"""
             עדכון סטטוס הלוואה
             
-            שלום {loan_data.get('borrower_name', 'יקר/ה')},
+            {greeting}
             
             אנו מעדכנים אותך על שינוי בסטטוס ההלוואה שלך:
             {old_status_he} → {new_status_he}

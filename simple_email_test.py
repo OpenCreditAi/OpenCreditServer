@@ -1,70 +1,50 @@
 #!/usr/bin/env python3
 """
-Simple email test to verify Gmail App Password
+Simple email test with correct API key
 """
 
-import smtplib
-import ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import requests
+import json
 
-def test_gmail_connection():
-    """Test Gmail connection with App Password"""
+def test_loan_status_update():
+    """Test loan status update to trigger email sending"""
+    url = "http://127.0.0.1:5000/loans/21/status"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczNjg5NzQwMCwianRpIjoiYjQ5YzQ5YjAtYjQ5Yy00YjQ5LWI0OTktYjQ5YzQ5YjQ5YzQ5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Inlvbml0YW5zaW5heUBnbWFpbC5jb20iLCJuYmYiOjE3MzY4OTc0MDAsImV4cCI6MTczNjkwMTAwMH0.example",  # Replace with real token
+        "Content-Type": "application/json"
+    }
+    data = {"status": "ACTIVE_LOAN"}
     
-    # Your Gmail credentials
-    email_user = "yonatansinay@gmail.com"
-    email_password = "your-16-character-app-password-here"  # Replace with your actual 16-character App Password
-    
-    # Test email
-    to_email = "yonatansinay@gmail.com"  # Send to yourself
-    subject = "Test Email from OpenCredit"
-    body = "This is a test email to verify the Gmail App Password is working correctly."
+    print("🧪 Testing loan status update with email sending...")
+    print(f"URL: {url}")
+    print(f"Data: {json.dumps(data)}")
     
     try:
-        # Create message
-        msg = MIMEMultipart()
-        msg['From'] = email_user
-        msg['To'] = to_email
-        msg['Subject'] = subject
-        msg.attach(MIMEText(body, 'plain'))
+        response = requests.put(url, headers=headers, json=data)
+        result = response.json()
         
-        # Connect to Gmail
-        print(f"Connecting to Gmail SMTP server...")
-        print(f"Email: {email_user}")
-        print(f"Password length: {len(email_password)} characters")
+        print(f"Status Code: {response.status_code}")
+        print(f"Response: {json.dumps(result, indent=2)}")
         
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        
-        print("Attempting to login...")
-        server.login(email_user, email_password)
-        
-        print("Login successful! Sending email...")
-        server.send_message(msg)
-        server.quit()
-        
-        print("✅ Email sent successfully!")
-        print(f"Check your inbox at {to_email}")
-        return True
-        
-    except smtplib.SMTPAuthenticationError as e:
-        print("❌ Authentication failed!")
-        print(f"Error: {e}")
-        print("\nPossible solutions:")
-        print("1. Make sure 2FA is enabled on your Google account")
-        print("2. Generate a new App Password (16 characters)")
-        print("3. Use the App Password, not your regular password")
-        print("4. Make sure there are no spaces in the App Password")
-        return False
-        
+        if response.status_code == 200:
+            if result.get('borrower_email_sent') and result.get('financier_email_sent'):
+                print("✅ SUCCESS - Both emails sent!")
+                return True
+            else:
+                print("⚠️  Status updated but emails not sent")
+                print(f"   Borrower email: {result.get('borrower_email_sent')}")
+                print(f"   Financier email: {result.get('financier_email_sent')}")
+                return False
+        else:
+            print(f"❌ FAILED - {result.get('error', 'Unknown error')}")
+            return False
+            
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ ERROR - {str(e)}")
         return False
 
 if __name__ == "__main__":
-    print("Gmail App Password Test")
-    print("======================")
-    print("This will test your Gmail App Password directly")
-    print()
-    
-    test_gmail_connection()
+    print("🔧 Testing Email Sending Fix")
+    print("=" * 40)
+    print("Note: Make sure to replace the JWT token with a real one!")
+    test_loan_status_update()
