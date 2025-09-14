@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Initialize migrations if they don't exist
@@ -21,4 +22,4 @@ with app.app_context():
 "
 
 # Start the server
-gunicorn --bind 0.0.0.0:5000 run:app 
+gunicorn --bind 0.0.0.0:5000 run:app
